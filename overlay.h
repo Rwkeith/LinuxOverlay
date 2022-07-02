@@ -11,6 +11,8 @@
 #include <GLFW/glfw3.h> // Will drag system OpenGL headers
 
 extern bool showMenu;
+bool windowSetMode = true;
+int g_xpos, g_ypos, g_width, g_height;
 
 static void glfw_error_callback(int error, const char* description)
 {
@@ -21,6 +23,8 @@ class Overlay
 {
 private:
     GLFWwindow* window;
+    ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
+    ImVec4 orig_color = ImVec4(0.0f, 0.0f, 0.0f, 0.00f);
 public:
     Overlay();
     ~Overlay();
@@ -56,18 +60,28 @@ Overlay::Overlay()
     // aspect ratio 16 to 9
     windowHeight = static_cast<int>(videoMode->height / 16 * 9);
 
-    glfwGetMonitorPos(monitors[0], &monitorX, &monitorY);
+    glfwGetMonitorPos(monitors[1], &monitorX, &monitorY);
 
     // Create window with graphics context
     printf("Monitorx: %i\n", monitorX);
     printf("Monitory: %i\n", monitorY);
 
-    window = glfwCreateWindow(2560, 1440, "Dear ImGui GLFW+OpenGL3 example", NULL, NULL);
-    
+    int fullscreenWidth, fullscreenHeight, xpos, ypos;
+    //window = glfwCreateWindow(2560, 1440, "Dear ImGui GLFW+OpenGL3 example", NULL, NULL);
+    //window = glfwCreateWindow(glfwGetVideoMode(glfwGetPrimaryMonitor())->width, glfwGetVideoMode(glfwGetPrimaryMonitor())->height, "Dear ImGui GLFW+OpenGL3 example", glfwGetPrimaryMonitor(), NULL);
+
+    //printf("w:%i h:%i x:%i y:%i\n", fullscreenWidth, fullscreenHeight, xpos, ypos);
+
+    //glfwDestroyWindow(window);
+    window = glfwCreateWindow(2560, 1440, "Dear ImGui GLFW+OpenGL3 example",NULL, NULL);
+
     //glfwSetWindowMonitor(window, monitors[0], 0, 0, videoMode->width, videoMode->height, videoMode->refreshRate);
-    glfwSetWindowPos(window, monitorX + (videoMode->width - windowWidth) / 2, monitorY + (videoMode->height - windowHeight) / 2);
+    
+    glfwSetWindowPos(window, (monitorX + (videoMode->width - windowWidth) / 2), monitorY + (videoMode->height - windowHeight) / 2);
+    glfwGetWindowSize(window, &g_width, &g_height);
+    glfwGetWindowPos(window, &g_xpos, &g_ypos);
+
     glfwSetWindowAttrib(window, GLFW_DECORATED, GLFW_FALSE);
-    //glfwSetWindowAttrib(window, GLFW_MAXIMIZED, GLFW_TRUE);
     //glfwSetWindowAttrib(window, GLFW_FLOATING, GLFW_TRUE);
     glfwSetWindowAttrib(window, GLFW_MOUSE_PASSTHROUGH, false);
 
@@ -87,8 +101,6 @@ Overlay::Overlay()
     // Setup Platform/Renderer backends
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     ImGui_ImplOpenGL3_Init(glsl_version);
-
-    //ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 }
 
 Overlay::~Overlay()
@@ -104,19 +116,28 @@ Overlay::~Overlay()
 
 void Overlay::Run()
 {
+    int setTransparent = 0;
     while (!glfwWindowShouldClose(window))
-    {       
+    {
         glfwPollEvents();
         // Start the Dear ImGui frame
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
         
+        if (windowSetMode)
+        {
+            sleep(0.5);
+            glfwSetWindowPos(window, g_xpos, g_ypos);
+            glfwSetWindowSize(window, g_width, g_height);
+        }
+        
+
         if (showMenu)
         {
             glfwSetWindowAttrib(window, GLFW_MOUSE_PASSTHROUGH, GLFW_FALSE);
             Update();
-        }
+        } 
         else
         {
             glfwSetWindowAttrib(window, GLFW_MOUSE_PASSTHROUGH, GLFW_TRUE);
@@ -127,9 +148,17 @@ void Overlay::Run()
         int display_w, display_h;
         glfwGetFramebufferSize(window, &display_w, &display_h);
         glViewport(0, 0, display_w, display_h);
-        //glClearColor(clear_color.x * clear_color.w, clear_color.y * clear_color.w, clear_color.z * clear_color.w, clear_color.w);
+        
+        if (windowSetMode)
+        {
+            glClearColor(clear_color.x * clear_color.w, clear_color.y * clear_color.w, clear_color.z * clear_color.w, clear_color.w);
+        }
+        else
+        {
+            glClearColor(orig_color.x * orig_color.w, orig_color.y * orig_color.w, orig_color.z * orig_color.w, orig_color.w);
+        }
         glClear(GL_COLOR_BUFFER_BIT);
-        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+       ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
         glfwSwapBuffers(window);
     }
