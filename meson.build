@@ -1,4 +1,4 @@
-project('ImGui Overlay', 'cpp')
+project('Linux ImGui Overlay', 'cpp')
 
 incdir = include_directories('/home/keith/git/imgui/backends', '/home/keith/git/imgui')
 
@@ -17,5 +17,5 @@ files = files(
     '/home/keith/git/imgui/backends/imgui_impl_opengl3.cpp',
 )
 
-executable('example', files, include_directories : incdir, dependencies : [glfw_lib, gl, thread_dep] )
+executable('LinuxOverlay', files, include_directories : incdir, dependencies : [glfw_lib, gl, thread_dep] )
 

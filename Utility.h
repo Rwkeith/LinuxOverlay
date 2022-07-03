@@ -29,7 +29,7 @@ Utility::~Utility()
 int Utility::GetProcessPID(const char* procName, bool wait = false)
 {
     char pidLine[1024];
-    char commandStr[] = "pidof "; 
+    char commandStr[] = "pidof ";
     strcat(commandStr, procName);
     FILE * command = popen(commandStr, "r");
 
@@ -111,7 +111,7 @@ long Utility::GetFreeSpaceAddr(int procID)
         //        endAddr, prot, str, str);
         sscanf(line, "%lx-%lx %s %*s %s", &startAddr,
                &endAddr, prot, owner);
-        if(strcmp(owner, "00:00") == 0)
+        if(strcmp(owner, "00:00") == 0 && !strstr(line, "[heap]") && !strstr(line,"[stack]"))
         {
             printf("Free space found at: 0x%lx\n", startAddr);
             return startAddr;

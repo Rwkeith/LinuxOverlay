@@ -12,8 +12,17 @@ int main(int, char**)
     /*long monolibBase = */Utility::GetModuleHandle("libmonobdwgc-2.0.so", valheimPID);
     /*long freeSpaceAddr = */Utility::GetFreeSpaceAddr(valheimPID);
     // Run() blocks
+
     Input inputHandler;
-    Overlay ol;
-    ol.Run();
-    return 0;
+    if (inputHandler.attached)
+    {
+        Overlay ol;
+        ol.Run();
+        return 0;
+    }
+    else
+    {
+        printf("Failed to attach input handler...\n");
+        return -1;
+    }
 }

@@ -36,7 +36,82 @@ extern bool shouldExit;
 extern bool windowSetMode;
 extern int g_xpos, g_ypos, g_width, g_height;
 
-void InputHandler(int fd, const char * deviceName)
+
+class Input
+{
+private:
+    int keyboardDesc;
+    // could be different on different systems...
+    const char* deviceName = "/dev/input/event2";
+    std::thread handlerThread;
+public:
+    bool attached = false;
+    Input();
+    ~Input();
+    void InputHandler();
+};
+
+Input::Input()
+{
+    /* A few examples of information to gather */
+    unsigned version;
+    unsigned short id[4];                   /* or use struct input_id */
+    char name[256] = "N/A";
+
+    fprintf(stderr, "Opening keyboard device: %s\n", deviceName);
+
+    if ((keyboardDesc = open(deviceName, O_RDONLY)) < 0) {
+        fprintf(stderr,
+            "ERR %d:\n"
+            "Unable to open `%s'.  Try running as sudo.\n"
+            "%s\n",
+            errno, deviceName, strerror(errno)
+        );
+        attached = false;
+        return;
+    }
+    attached = true;
+    /* Error check here as well. */
+    ioctl(keyboardDesc, EVIOCGVERSION, &version);
+    ioctl(keyboardDesc, EVIOCGID, id); 
+    ioctl(keyboardDesc, EVIOCGNAME(sizeof(name)), name);
+
+    fprintf(stderr,
+        "Name      : %s\n"
+        "Version   : %d.%d.%d\n"
+        "ID        : Bus=%04x Vendor=%04x Product=%04x Version=%04x\n"
+        "----------\n"
+        ,
+        name,
+
+        version >> 16,
+        (version >> 8) & 0xff,
+        version & 0xff,
+
+        id[ID_BUS],
+        id[ID_VENDOR],
+        id[ID_PRODUCT],
+        id[ID_VERSION]
+    );
+
+    handlerThread = std::thread(&Input::InputHandler, this);
+}
+
+Input::~Input()
+{
+    if (handlerThread.joinable())
+    {
+        shouldExit = true;
+        handlerThread.join();
+    }
+    
+    if (keyboardDesc)
+    {
+        close(keyboardDesc);
+    }
+}
+
+void Input::InputHandler()
 {
     int stepSize = 100;
     /* Loop. Read event file and parse result. */
@@ -48,7 +123,7 @@ void InputHandler(int fd, const char * deviceName)
     
     while(windowSetMode)
     {
-        sz = read(fd, ev, sizeof(struct input_event) * EV_BUF_SIZE);
+        sz = read(keyboardDesc, ev, sizeof(struct input_event) * EV_BUF_SIZE);
 
         if (sz < (int) sizeof(struct input_event)) {
             fprintf(stderr,
@@ -187,7 +262,7 @@ void InputHandler(int fd, const char * deviceName)
     
     while(!shouldExit)
     {
-        sz = read(fd, ev, sizeof(struct input_event) * EV_BUF_SIZE);
+        sz = read(keyboardDesc, ev, sizeof(struct input_event) * EV_BUF_SIZE);
 
         if (sz < (int) sizeof(struct input_event)) {
             fprintf(stderr,
@@ -228,65 +303,4 @@ void InputHandler(int fd, const char * deviceName)
             
         }
     }
-}
-
-class Input
-{
-private:
-    int keyboard_fd;
-    // could be different on different systems...
-    const char* deviceName = "/dev/input/event2";
-public:
-    Input();
-    ~Input();
-};
-
-Input::Input()
-{
-    /* A few examples of information to gather */
-    unsigned version;
-    unsigned short id[4];                   /* or use struct input_id */
-    char name[256] = "N/A";
-
-    fprintf(stderr, "Opening keyboard device: %s\n", deviceName);
-
-    if ((keyboard_fd = open(deviceName, O_RDONLY)) < 0) {
-        fprintf(stderr,
-            "ERR %d:\n"
-            "Unable to open `%s'\n"
-            "%s\n",
-            errno, deviceName, strerror(errno)
-        );
-    }
-    /* Error check here as well. */
-    ioctl(keyboard_fd, EVIOCGVERSION, &version);
-    ioctl(keyboard_fd, EVIOCGID, id); 
-    ioctl(keyboard_fd, EVIOCGNAME(sizeof(name)), name);
-
-    fprintf(stderr,
-        "Name      : %s\n"
-        "Version   : %d.%d.%d\n"
-        "ID        : Bus=%04x Vendor=%04x Product=%04x Version=%04x\n"
-        "----------\n"
-        ,
-        name,
-
-        version >> 16,
-        (version >> 8) & 0xff,
-        version & 0xff,
-
-        id[ID_BUS],
-        id[ID_VENDOR],
-        id[ID_PRODUCT],
-        id[ID_VERSION]
-    );
-
-
-    std::thread t1(InputHandler, keyboard_fd, deviceName);
-    t1.detach();
-}
-
-Input::~Input()
-{
-    close(keyboard_fd);
 }
