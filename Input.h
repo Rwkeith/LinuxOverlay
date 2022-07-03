@@ -14,6 +14,8 @@
 
 #include <thread>
 
+//#define DEBUG_PRINTS
+
 #define EV_BUF_SIZE 16
 
 #define INSERT_KEY 458825
@@ -58,6 +60,7 @@ void InputHandler(int fd, const char * deviceName)
             return;
         }
         for (i = 0; i < sz / sizeof(struct input_event); ++i) {
+#ifdef DEBUG_PRINTS
             fprintf(stderr,
                 "%ld.%06ld: "
                 "type=%02x "
@@ -70,6 +73,7 @@ void InputHandler(int fd, const char * deviceName)
                 ev[i].value
             );
             printf("ev[i].value as signed int: %i\n", ev[i].value);
+#endif
             if (ev[i].value == SPACE_KEY && ev[i].code == 4 && ev[i].type == 4)
             {
                 // registered twice, press and release
@@ -197,6 +201,7 @@ void InputHandler(int fd, const char * deviceName)
 
         /* Implement code to translate type, code and value */
         for (i = 0; i < sz / sizeof(struct input_event); ++i) {
+#ifdef DEBUG_PRINTS
             fprintf(stderr,
                 "%ld.%06ld: "
                 "type=%02x "
@@ -209,6 +214,7 @@ void InputHandler(int fd, const char * deviceName)
                 ev[i].value
             );
             printf("ev[i].value as signed int: %i\n", ev[i].value);
+#endif
             if (ev[i].value == INSERT_KEY && ev[i].code == 4 && ev[i].type == 4)
             {
                 // registered twice, press and release
@@ -224,18 +230,18 @@ void InputHandler(int fd, const char * deviceName)
     }
 }
 
-class input
+class Input
 {
 private:
-    int fd;
+    int keyboard_fd;
     // could be different on different systems...
     const char* deviceName = "/dev/input/event2";
 public:
-    input();
-    ~input();
+    Input();
+    ~Input();
 };
 
-input::input()
+Input::Input()
 {
     /* A few examples of information to gather */
     unsigned version;
@@ -244,7 +250,7 @@ input::input()
 
     fprintf(stderr, "Opening keyboard device: %s\n", deviceName);
 
-    if ((fd = open(deviceName, O_RDONLY)) < 0) {
+    if ((keyboard_fd = open(deviceName, O_RDONLY)) < 0) {
         fprintf(stderr,
             "ERR %d:\n"
             "Unable to open `%s'\n"
@@ -253,9 +259,9 @@ input::input()
         );
     }
     /* Error check here as well. */
-    ioctl(fd, EVIOCGVERSION, &version);
-    ioctl(fd, EVIOCGID, id); 
-    ioctl(fd, EVIOCGNAME(sizeof(name)), name);
+    ioctl(keyboard_fd, EVIOCGVERSION, &version);
+    ioctl(keyboard_fd, EVIOCGID, id); 
+    ioctl(keyboard_fd, EVIOCGNAME(sizeof(name)), name);
 
     fprintf(stderr,
         "Name      : %s\n"
@@ -276,18 +282,11 @@ input::input()
     );
 
 
-    std::thread t1(InputHandler, fd, deviceName);
+    std::thread t1(InputHandler, keyboard_fd, deviceName);
     t1.detach();
 }
 
-input::~input()
+Input::~Input()
 {
-    close(fd);
+    close(keyboard_fd);
 }
-
-/*
-for insert:
-1656442620.536780: type=04 code=04 value=70049
-1656442620.536780: type=01 code=6e value=01
-1656442620.536780: type=00 code=00 value=00
-*/

@@ -23,8 +23,8 @@ class Overlay
 {
 private:
     GLFWwindow* window;
-    ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
     ImVec4 orig_color = ImVec4(0.0f, 0.0f, 0.0f, 0.00f);
+    ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 public:
     Overlay();
     ~Overlay();
@@ -46,43 +46,16 @@ Overlay::Overlay()
 
     glfwWindowHint(GLFW_FLOATING, GLFW_TRUE);
     glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
-    //glfwWindowHint(GLFW_MAXIMIZED, GLFW_TRUE);
     glfwWindowHint(GLFW_TRANSPARENT_FRAMEBUFFER, GLFW_TRUE);
     glfwWindowHint(GLFW_FOCUSED, true);
 
-    int count, windowWidth, windowHeight, monitorX, monitorY;
-
-    // I am assuming that main monitor is in the 0 position
-    GLFWmonitor** monitors = glfwGetMonitors(&count);
-    const GLFWvidmode* videoMode = glfwGetVideoMode(monitors[0]);
-    // width: 75% of the screen
-    windowWidth = static_cast<int>(videoMode->width / 1.5);
-    // aspect ratio 16 to 9
-    windowHeight = static_cast<int>(videoMode->height / 16 * 9);
-
-    glfwGetMonitorPos(monitors[1], &monitorX, &monitorY);
-
-    // Create window with graphics context
-    printf("Monitorx: %i\n", monitorX);
-    printf("Monitory: %i\n", monitorY);
-
-    int fullscreenWidth, fullscreenHeight, xpos, ypos;
-    //window = glfwCreateWindow(2560, 1440, "Dear ImGui GLFW+OpenGL3 example", NULL, NULL);
-    //window = glfwCreateWindow(glfwGetVideoMode(glfwGetPrimaryMonitor())->width, glfwGetVideoMode(glfwGetPrimaryMonitor())->height, "Dear ImGui GLFW+OpenGL3 example", glfwGetPrimaryMonitor(), NULL);
-
-    //printf("w:%i h:%i x:%i y:%i\n", fullscreenWidth, fullscreenHeight, xpos, ypos);
-
-    //glfwDestroyWindow(window);
     window = glfwCreateWindow(2560, 1440, "Dear ImGui GLFW+OpenGL3 example",NULL, NULL);
 
-    //glfwSetWindowMonitor(window, monitors[0], 0, 0, videoMode->width, videoMode->height, videoMode->refreshRate);
-    
-    glfwSetWindowPos(window, (monitorX + (videoMode->width - windowWidth) / 2), monitorY + (videoMode->height - windowHeight) / 2);
+
     glfwGetWindowSize(window, &g_width, &g_height);
     glfwGetWindowPos(window, &g_xpos, &g_ypos);
 
     glfwSetWindowAttrib(window, GLFW_DECORATED, GLFW_FALSE);
-    //glfwSetWindowAttrib(window, GLFW_FLOATING, GLFW_TRUE);
     glfwSetWindowAttrib(window, GLFW_MOUSE_PASSTHROUGH, false);
 
     if (window == NULL)
@@ -116,7 +89,6 @@ Overlay::~Overlay()
 
 void Overlay::Run()
 {
-    int setTransparent = 0;
     while (!glfwWindowShouldClose(window))
     {
         glfwPollEvents();

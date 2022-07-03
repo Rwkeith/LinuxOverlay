@@ -5,28 +5,28 @@
 #include <string.h>
 #include <dlfcn.h>
 
-class utility
+class Utility
 {
 private:
     
 public:
-    utility();
-    ~utility();
+    Utility();
+    ~Utility();
     static int GetProcessPID(const char* procName, bool wait);
     static long GetModuleHandle(const char* moduleName, int procID);
     static long GetFreeSpaceAddr(int procID);
 };
 
-utility::utility()
+Utility::Utility()
 {
 }
 
-utility::~utility()
+Utility::~Utility()
 {
 }
 
 
-int utility::GetProcessPID(const char* procName, bool wait = false)
+int Utility::GetProcessPID(const char* procName, bool wait = false)
 {
     char pidLine[1024];
     char commandStr[] = "pidof "; 
@@ -63,14 +63,14 @@ int utility::GetProcessPID(const char* procName, bool wait = false)
     return pid;
 }
 
-long utility::GetModuleHandle(const char* moduleName, int procID)
+long Utility::GetModuleHandle(const char* moduleName, int procID)
 {
     size_t buffSize = 0x1000;
     char* buffer = (char *)malloc(buffSize * sizeof(char));
     sprintf(buffer, "/proc/%d/maps", procID);
     FILE * fp = fopen(buffer, "r");
     long addr;
-    char str[20];
+    //char str[20];
     if (!fp)
     {
         perror("fopen");
@@ -81,7 +81,8 @@ long utility::GetModuleHandle(const char* moduleName, int procID)
         char* ret = strstr(buffer, moduleName);
         if (ret)
         {
-            sscanf(buffer, "%lx-%*lx %*s %*s %s", &addr, str, str, str, str);
+            //sscanf(buffer, "%lx-%*lx %*s %*s %s", &addr, str, str, str, str);
+            sscanf(buffer, "%lx-%*x %*s %*s %*s", &addr);
             printf("Found base address of %s: 0x%lx\n", moduleName, addr);
             return addr;
         }
@@ -92,26 +93,28 @@ long utility::GetModuleHandle(const char* moduleName, int procID)
     return 0;
 }
 
-long utility::GetFreeSpaceAddr(int procID)
+long Utility::GetFreeSpaceAddr(int procID)
 {
     FILE *fp;
     char filename[30];
     char line[85];
-    long addr;
-    char str[20];
-    char endAddr[20];
+    long startAddr;
+    char owner[20];
+    long endAddr;
     char prot[20];
     sprintf(filename, "/proc/%d/maps", procID);
     fp = fopen(filename, "r");
     if(fp == NULL)
         exit(1);
     while(fgets(line, 85, fp) != NULL) {
-        sscanf(line, "%lx-%*lx %*s %*s %s", &addr,
-               endAddr, prot, str, str);
-        if(strcmp(str, "00:00") == 0)
+        // sscanf(line, "%lx-%*lx %*s %*s %s", &addr,
+        //        endAddr, prot, str, str);
+        sscanf(line, "%lx-%lx %s %*s %s", &startAddr,
+               &endAddr, prot, owner);
+        if(strcmp(owner, "00:00") == 0)
         {
-            printf("Free space found at: 0x%lx\n", addr);
-            return addr;
+            printf("Free space found at: 0x%lx\n", startAddr);
+            return startAddr;
         }
             
     }
