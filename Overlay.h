@@ -23,13 +23,12 @@ class Overlay
 {
 private:
     GLFWwindow* window;
-    ImVec4 orig_color = ImVec4(0.0f, 0.0f, 0.0f, 0.00f);
-    ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 public:
     Overlay();
     ~Overlay();
     void Run();
     void Update();
+    void WindowSetUpdate();
 };
 
 Overlay::Overlay()
@@ -96,12 +95,12 @@ void Overlay::Run()
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
-        
         if (windowSetMode)
         {
             sleep(0.5);
             glfwSetWindowPos(window, g_xpos, g_ypos);
             glfwSetWindowSize(window, g_width, g_height);
+            WindowSetUpdate();
         }
         
 
@@ -120,18 +119,8 @@ void Overlay::Run()
         int display_w, display_h;
         glfwGetFramebufferSize(window, &display_w, &display_h);
         glViewport(0, 0, display_w, display_h);
-        
-        if (windowSetMode)
-        {
-            glClearColor(clear_color.x * clear_color.w, clear_color.y * clear_color.w, clear_color.z * clear_color.w, clear_color.w);
-        }
-        else
-        {
-            glClearColor(orig_color.x * orig_color.w, orig_color.y * orig_color.w, orig_color.z * orig_color.w, orig_color.w);
-        }
         glClear(GL_COLOR_BUFFER_BIT);
-       ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
         glfwSwapBuffers(window);
     }
 }
@@ -153,4 +142,16 @@ void Overlay::Update()
         ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
         ImGui::End();
     }
+}
+
+void Overlay::WindowSetUpdate()
+{
+        ImVec2 canvas_pos = ImGui::GetCursorScreenPos();
+        ImVec2 canvas_size = ImGui::GetContentRegionAvail();
+        canvas_pos.x = 0;
+        canvas_pos.y = 0;
+        canvas_size.x = 2560;
+        canvas_size.y = 1440;
+        ImGui::GetBackgroundDrawList()->AddRectFilledMultiColor(canvas_pos, ImVec2(canvas_pos.x + canvas_size.x, canvas_pos.y + canvas_size.y), IM_COL32(50, 50, 50, 255), IM_COL32(50, 50, 60, 255), IM_COL32(60, 60, 70, 255), IM_COL32(50, 50, 60, 255));
+        ImGui::GetBackgroundDrawList()->AddRect(canvas_pos, ImVec2(canvas_pos.x + canvas_size.x, canvas_pos.y + canvas_size.y), IM_COL32(255, 255, 255, 255));
 }
