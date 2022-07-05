@@ -1,0 +1,5 @@
+option('build_type',
+    type: 'combo',
+    description: 'build as standalone to test or be used as a dependency',
+    value: 'standalone',
+    choices: ['standalone', 'dependency'])

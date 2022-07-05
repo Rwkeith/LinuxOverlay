@@ -60,13 +60,16 @@ Overlay::Overlay()
 
 Overlay::~Overlay()
 {
-    // Cleanup
-    ImGui_ImplOpenGL3_Shutdown();
-    ImGui_ImplGlfw_Shutdown();
-    ImGui::DestroyContext();
+    if (window)
+    {
+        // Cleanup
+        ImGui_ImplOpenGL3_Shutdown();
+        ImGui_ImplGlfw_Shutdown();
+        ImGui::DestroyContext();
 
-    glfwDestroyWindow(window);
-    glfwTerminate();
+        glfwDestroyWindow(window);
+        glfwTerminate();
+    }
 }
 
 void Overlay::Run()
@@ -116,9 +119,9 @@ void Overlay::Update()
 
     if (inputHandler.showMenu)
     {
-        ImGui::Begin("Hello, world!");                          // Create a window called "Hello, world!" and append into it.
-        ImGui::Text("This is some useful text.");               // Display some text (you can use a format strings too)
-        if (ImGui::Button("Exit"))                            // Buttons return true when clicked (most widgets return true when edited/activated)
+        ImGui::Begin("Hello, world!");
+        ImGui::Text("This is some useful text.");
+        if (ImGui::Button("Exit"))
         {
             inputHandler.shouldExit = true;
             std::exit(0);

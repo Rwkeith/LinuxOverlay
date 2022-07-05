@@ -4,6 +4,9 @@
 int main(int, char**)
 {
     Overlay overlay;
-    overlay.Run();
+    if (overlay.isInitialized)
+    {
+        overlay.Run();
+    }
     return 0;
 }
