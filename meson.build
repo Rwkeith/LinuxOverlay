@@ -8,6 +8,8 @@ thread_dep = dependency('threads')
 
 files = files(
     'main.cpp',
+    'Overlay.cpp',
+    'Input.cpp',
     '/home/keith/git/imgui/imgui.cpp',
     '/home/keith/git/imgui/imgui_draw.cpp',
     '/home/keith/git/imgui/imgui_tables.cpp',

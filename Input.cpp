@@ -1,55 +1,4 @@
-#pragma once
-
-#include <stdio.h>
-#include <stdlib.h>
-
-#include <string.h>     /* strerror() */
-#include <errno.h>      /* errno */
-
-#include <fcntl.h>      /* open() */
-#include <unistd.h>     /* close() */
-#include <sys/ioctl.h>  /* ioctl() */
-
-#include <linux/input.h>    /* EVIOCGVERSION ++ */
-
-#include <thread>
-
-//#define DEBUG_PRINTS
-
-#define EV_BUF_SIZE 16
-
-#define INSERT_KEY 458825
-#define LEFT_KEY 458832
-#define RIGHT_KEY 458831
-#define UP_KEY 458834
-#define DOWN_KEY 458833
-#define SPACE_KEY 458796
-#define NUMPAD_PLUS 458839
-#define NUMPAD_MINUS 458838
-#define NUMPAD_2 458842
-#define NUMPAD_1 458841
-#define NUMPAD_5 458845
-#define NUMPAD_4 458844
-
-extern bool showMenu;
-extern bool shouldExit;
-extern bool windowSetMode;
-extern int g_xpos, g_ypos, g_width, g_height;
-
-
-class Input
-{
-private:
-    int keyboardDesc;
-    // could be different on different systems...
-    const char* deviceName = "/dev/input/event2";
-    std::thread handlerThread;
-public:
-    bool attached = false;
-    Input();
-    ~Input();
-    void InputHandler();
-};
+#include "include/Input.h"
 
 Input::Input()
 {
@@ -73,7 +22,7 @@ Input::Input()
     attached = true;
     /* Error check here as well. */
     ioctl(keyboardDesc, EVIOCGVERSION, &version);
-    ioctl(keyboardDesc, EVIOCGID, id); 
+    ioctl(keyboardDesc, EVIOCGID, id);
     ioctl(keyboardDesc, EVIOCGNAME(sizeof(name)), name);
 
     fprintf(stderr,
@@ -94,15 +43,16 @@ Input::Input()
         id[ID_VERSION]
     );
 
-    handlerThread = std::thread(&Input::InputHandler, this);
+    inputHandlerThread = std::thread(&Input::InputHandler, this);
+    printf("Successfully created input thread.\n");
 }
 
 Input::~Input()
 {
-    if (handlerThread.joinable())
+    if (inputHandlerThread.joinable())
     {
         shouldExit = true;
-        handlerThread.join();
+        inputHandlerThread.join();
     }
     
     if (keyboardDesc)
@@ -111,16 +61,21 @@ Input::~Input()
     }
 }
 
+// runs in a separate thread
 void Input::InputHandler()
 {
+    // blocks until windowSetMode is false / space is pressed
+    CaptureSetMode();
+    // blocks until shouldExit is true
+    CaptureMenuToggle();
+}
+
+void Input::CaptureSetMode()
+{
     int stepSize = 100;
-    /* Loop. Read event file and parse result. */
-    int sz;
     unsigned i;
-    int count = 0, leftcount, rightcount ,upcount , downcount, numpluscount, numminuscount, numpad2count, numpad1count, numpad5count, numpad4count;
-    int spaceKeyCount = 0;
-    struct input_event ev[EV_BUF_SIZE]; /* Read up to N events at a time */
-    
+    int sz, leftcount, rightcount ,upcount , downcount, numpluscount, numminuscount, numpad2count, numpad1count, numpad5count, numpad4count, spaceKeyCount;
+    struct input_event ev[EV_BUF_SIZE];
     while(windowSetMode)
     {
         sz = read(keyboardDesc, ev, sizeof(struct input_event) * EV_BUF_SIZE);
@@ -156,7 +111,7 @@ void Input::InputHandler()
                 if (spaceKeyCount % 2 == 0)
                 {
                     printf("Space key pressed, Setting window's final x,y,width,height\n");
-                    windowSetMode = !windowSetMode;
+                    windowSetMode = false;
                 }
             }
     
@@ -168,28 +123,28 @@ void Input::InputHandler()
                     leftcount += 1;
                     if (leftcount % 2 == 0)
                     {
-                        g_xpos -= stepSize;  
+                        xpos -= stepSize;  
                     }
                     break;
                 case RIGHT_KEY:
                     rightcount += 1;
                     if (rightcount % 2 == 0)
                     {
-                        g_xpos += stepSize;  
+                        xpos += stepSize;  
                     }
                     break;
                 case UP_KEY:
                     upcount += 1;
                     if (upcount % 2 == 0)
                     {
-                        g_ypos -= stepSize;
+                        ypos -= stepSize;
                     }
                     break;
                 case DOWN_KEY:
                     downcount += 1;
                     if (downcount % 2 == 0)
                     {
-                        g_ypos += stepSize;
+                        ypos += stepSize;
                     }
                     break;
                 case NUMPAD_PLUS:
@@ -229,28 +184,28 @@ void Input::InputHandler()
                     numpad2count += 1;
                     if (downcount % 2 == 0)
                     {
-                        g_width += stepSize;
+                        width += stepSize;
                     }
                     break;
                 case NUMPAD_1:
                     numpad1count += 1;
                     if (numpad1count % 2 == 0)
                     {
-                        g_width -= stepSize;
+                        width -= stepSize;
                     }
                     break;
                 case NUMPAD_5:
                     numpad5count += 1;
                     if (numpad5count % 2 == 0)
                     {
-                        g_height += stepSize;
+                        height += stepSize;
                     }
                     break;
                 case NUMPAD_4:
                     numpad4count += 1;
                     if (numpad4count % 2 == 0)
                     {
-                        g_height -= stepSize;
+                        height -= stepSize;
                     }
                     break;
                 default:
@@ -259,7 +214,13 @@ void Input::InputHandler()
             }
         }
     }
-    
+}
+
+void Input::CaptureMenuToggle()
+{
+    unsigned i;
+    int sz, count;
+    struct input_event ev[EV_BUF_SIZE];
     while(!shouldExit)
     {
         sz = read(keyboardDesc, ev, sizeof(struct input_event) * EV_BUF_SIZE);
@@ -296,7 +257,7 @@ void Input::InputHandler()
                 count += 1;
                 if (count % 2 == 0)
                 {
-                    printf("INSERT KEY IS PRESSED, Toggling Menu\n");
+                    printf("Insert pressed, Toggling Menu\n");
                     showMenu = !showMenu;
                 }
             }
