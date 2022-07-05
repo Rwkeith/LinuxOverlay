@@ -1,5 +1,5 @@
-option('build_type',
+option('LinuxOverlayBuildType',
     type: 'combo',
-    description: 'build as standalone to test or be used as a dependency',
+    description: 'build as standalone to test or as a dependency',
     value: 'standalone',
-    choices: ['standalone', 'dependency'])
+    choices: ['standalone', 'dependency'], yield : true)

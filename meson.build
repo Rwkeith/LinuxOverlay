@@ -17,7 +17,7 @@ sources = [
     '/home/keith/git/imgui/backends/imgui_impl_glfw.cpp',
     '/home/keith/git/imgui/backends/imgui_impl_opengl3.cpp']
 
-buildType = get_option('build_type')
+buildType = get_option('LinuxOverlayBuildType')
 
 if buildType == 'standalone'
     sources += ['main.cpp']
