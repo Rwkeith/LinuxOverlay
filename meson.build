@@ -4,6 +4,8 @@ ImGUILib = subproject('ImGUI').get_variable('libImGUIDep')
 
 thread_dep = dependency('threads')
 
+linuxOverlayInc = include_directories('./include')
+
 sources = [
     'Overlay.cpp',
     'Input.cpp']
@@ -15,6 +17,5 @@ if buildType == 'standalone'
     executable('LinuxOverlay', sources, dependencies : [thread_dep, ImGUILib] ) # [glfwLib, gl, thread_dep, ImGUILib] )
 elif buildType == 'dependency'
     libLinuxOverlay = library('LinuxOverlay', sources, dependencies : [thread_dep, ImGUILib] ) # [glfwLib, ImGUILib, gl, thread_dep])
-    LinuxOverlayDep = declare_dependency(link_with : libLinuxOverlay) #, include_directories : incdir)
+    LinuxOverlayDep = declare_dependency(link_with : libLinuxOverlay, include_directories : [linuxOverlayInc])
 endif
-
