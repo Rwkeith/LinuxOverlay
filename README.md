@@ -61,8 +61,8 @@ LinuxOverlayLib = subproject('LinuxOverlay').get_variable('LinuxOverlayDep')
 
 yourIncs = include_directories('.', './include')
 
-ImGUIinc = subproject('ImGUI').get_variable('imguiInc')
-glfwInc = subproject('glfw').get_variable('glfwIncs')
+ImGUIinc = subproject('ImGUI').get_variable('imguiInc')  # will be pulled by LinuxOverlay
+glfwInc = subproject('glfw').get_variable('glfwIncs')    # will be pulled by ImGUI
 
 files = files(
     'Main.cpp',
