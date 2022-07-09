@@ -44,7 +44,7 @@ ninja -C builddir
 
 Then Run
 ```console
-sudo ./builddir/MemPenguin
+sudo ./builddir/LinuxOverlay
 ```
 
 ### Use as library for your project
