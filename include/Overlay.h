@@ -17,6 +17,10 @@ private:
     GLFWwindow* window;
     Input inputHandler;
     std::thread overlayThread;
+    int imageWidth;
+    int imageHeight;
+    GLuint arrowKeysTexture;
+    GLuint numKeysTexture;
 public:
     bool isInitialized;
     bool isRunning;
@@ -25,4 +29,6 @@ public:
     void Run();
     void Update();
     void WindowSetUpdate();
+    void KeysUpdate();
+    bool LoadTextureFromFile(const char* filename, GLuint& outTexture, int& outWidth, int& outHeight);
 };

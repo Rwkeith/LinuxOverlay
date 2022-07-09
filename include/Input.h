@@ -41,6 +41,7 @@ private:
     std::thread inputHandlerThread;
 public:
     int xpos, ypos, width, height;
+    int stepSize = 100;
     bool shouldExit, attached, showMenu;
     bool windowSetMode = true;
     Input();
