@@ -1,6 +1,6 @@
 [wrap-git]
 url = https://github.com/Rwkeith/imgui-meson.git
-revision = head
+revision = master
 
 [provide]
 dependency_names = ImGUI
