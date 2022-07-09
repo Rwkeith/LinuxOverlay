@@ -111,7 +111,7 @@ Overlay::Overlay()
         IM_ASSERT(ret);
         ret = LoadTextureFromFile(numKeysPath.c_str(), numKeysTexture, imageWidth, imageHeight);
         IM_ASSERT(ret);
-        printf("Successfully initialized LinuxOverlay v1.01...\n");
+        printf("Successfully initialized LinuxOverlay v1.02...\n");
     }
     else
     {
@@ -183,6 +183,11 @@ void Overlay::Update()
 
     if (inputHandler.showMenu)
     {
+        if (userUpdateFunc)
+        {
+            userUpdateFunc();
+        }
+        
         ImGui::Begin("Hello, world!");
         ImGui::Text("This is some useful text.");
         if (ImGui::Button("Exit"))
@@ -195,6 +200,11 @@ void Overlay::Update()
         ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
         ImGui::End();
     }
+}
+
+void Overlay::Register(UserOLFunc userFunc)
+{
+    userUpdateFunc = userFunc;
 }
 
 void Overlay::WindowSetUpdate()

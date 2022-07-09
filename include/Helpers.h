@@ -17,8 +17,5 @@ std::string GetExecutableDir()
     // Get the path and the name
     std::string path = aux.substr(0,pos+1);
     std::string name = aux.substr(pos+1);
-    // show results
-    std::cout << "Path: " << path << std::endl;
-    std::cout << "Name: " << name << std::endl;
     return path;
 }

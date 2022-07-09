@@ -21,6 +21,8 @@ private:
     int imageHeight;
     GLuint arrowKeysTexture;
     GLuint numKeysTexture;
+    typedef void (*UserOLFunc)();
+    UserOLFunc userUpdateFunc = NULL;
 public:
     bool isInitialized;
     bool isRunning;
@@ -30,5 +32,6 @@ public:
     void Update();
     void WindowSetUpdate();
     void KeysUpdate();
+    void Register(UserOLFunc userFunc);
     bool LoadTextureFromFile(const char* filename, GLuint& outTexture, int& outWidth, int& outHeight);
 };
