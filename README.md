@@ -1,4 +1,4 @@
-![Imgur Image](https://i.imgur.com/wKfUPEO.mp4) 
+![Imgur Image](https://imgur.com/a/tVmVN41) 
 # LinuxOverlay
 An external overlay which uses GLFW and ImGUI for drawing
 
