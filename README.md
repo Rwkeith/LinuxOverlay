@@ -1,4 +1,5 @@
-![Imgur Image](https://imgur.com/a/tVmVN41) 
+![Imgur Image](https://i.imgur.com/rM3tClN.png)
+
 # LinuxOverlay
 An external overlay which uses GLFW and ImGUI for drawing
 
@@ -8,7 +9,11 @@ This overlay setup uses GLFW as window manager.  It configures the window to be 
 
 ## Usage
 
-Run as sudo.  Press insert key to toggle the overlay.
+Run as sudo.  The overlay will start in window set mode.  Use the arrowkeys and numpad to adjust.  Then spacebar to set.
+
+![Imgur Image](https://i.imgur.com/zTeUZTR.png)
+
+Press insert key to toggle the overlay.
 
 ## Building
 
