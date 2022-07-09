@@ -18,3 +18,13 @@ Press insert key to toggle the overlay.
 ## Building
 
 Uses Meson with Ninja to build.
+
+```
+meson builddir
+ninja -C builddir
+```
+
+Then Run
+```
+sudo ./builddir/MemPenguin
+```
