@@ -10,7 +10,7 @@ This overlay setup uses GLFW as window manager.  It configures the window to be 
 ## Using as library
 
 Example using LinuxOverlay with your project
-```
+```cpp
 #include "Overlay.h"
 
 int main(int, char**)
@@ -37,13 +37,13 @@ Press insert key to toggle the overlay.
 Uses Meson with Ninja to build.
 
 ### Standalone build
-```
+```console
 meson builddir
 ninja -C builddir
 ```
 
 Then Run
-```
+```console
 sudo ./builddir/MemPenguin
 ```
 
@@ -52,11 +52,11 @@ sudo ./builddir/MemPenguin
 Your project needs a `meson_options.txt` and a `meson.build` file in it's root directory.
 
 In `meson_options.txt`:
-```
+```meson
 option('LinuxOverlayBuildType', type : 'combo', value : 'dependency', choices: ['standalone', 'dependency'])
 ```
 In `meson.build`:
-```
+```meson
 LinuxOverlayLib = subproject('LinuxOverlay').get_variable('LinuxOverlayDep')
 
 yourIncs = include_directories('.', './include')
