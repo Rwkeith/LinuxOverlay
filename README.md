@@ -7,7 +7,24 @@ An external overlay which uses GLFW and ImGUI for drawing
 
 This overlay setup uses GLFW as window manager.  It configures the window to be top-most, transparent, and borderless.  When toggling the overlay, mouse passthrough and the GUI is toggled.  Keyboard input is captured using the device /dev/input/eventN where N is for the keyboard device. Therefore Sudo/Root privledges are required to capture input.
 
-## Usage
+## Using as library
+
+Example using LinuxOverlay with your project
+```
+#include "Overlay.h"
+
+int main(int, char**)
+{
+    Overlay overlay;
+    if (overlay.isInitialized)
+    {
+        overlay.Run();
+    }
+    return 0;
+}
+```
+
+## Interface Usage
 
 Run as sudo.  The overlay will start in window set mode.  Use the arrowkeys and numpad to adjust.  Then spacebar to set.
 
@@ -19,6 +36,7 @@ Press insert key to toggle the overlay.
 
 Uses Meson with Ninja to build.
 
+### Standalone build
 ```
 meson builddir
 ninja -C builddir
@@ -27,4 +45,28 @@ ninja -C builddir
 Then Run
 ```
 sudo ./builddir/MemPenguin
+```
+
+### Use as library for your project
+
+Your project needs a `meson_options.txt` and a `meson.build` file in it's root directory.
+
+In `meson_options.txt`:
+```
+option('LinuxOverlayBuildType', type : 'combo', value : 'dependency', choices: ['standalone', 'dependency'])
+```
+In `meson.build`:
+```
+LinuxOverlayLib = subproject('LinuxOverlay').get_variable('LinuxOverlayDep')
+
+yourIncs = include_directories('.', './include')
+
+ImGUIinc = subproject('ImGUI').get_variable('imguiInc')
+glfwInc = subproject('glfw').get_variable('glfwIncs')
+
+files = files(
+    'Main.cpp',
+)
+
+executable('MyExe', files, include_directories : [yourIncs, ImGUIinc, glfwInc], dependencies : [LinuxOverlayLib] )
 ```
