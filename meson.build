@@ -12,6 +12,12 @@ sources = [
     'Overlay.cpp',
     'Input.cpp']
 
+srcResources = join_paths(meson.source_root(), 'resources')
+destResources = meson.build_root()
+message('Copying @0@ to @1@ ...'.format(srcResources, destResources))
+
+run_command('cp', '-R', srcResources, destResources, check : false)
+
 buildType = get_option('LinuxOverlayBuildType')
 
 if buildType == 'standalone'

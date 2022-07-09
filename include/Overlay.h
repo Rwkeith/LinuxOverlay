@@ -19,7 +19,8 @@ private:
     std::thread overlayThread;
     int imageWidth;
     int imageHeight;
-    GLuint imageTexture;
+    GLuint arrowKeysTexture;
+    GLuint numKeysTexture;
 public:
     bool isInitialized;
     bool isRunning;
@@ -29,5 +30,5 @@ public:
     void Update();
     void WindowSetUpdate();
     void KeysUpdate();
-    bool LoadTextureFromFile(const char* filename);
+    bool LoadTextureFromFile(const char* filename, GLuint& outTexture, int& outWidth, int& outHeight);
 };
