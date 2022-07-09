@@ -72,7 +72,6 @@ void Input::InputHandler()
 
 void Input::CaptureSetMode()
 {
-    int stepSize = 100;
     unsigned i;
     int sz, leftcount, rightcount ,upcount , downcount, numpluscount, numminuscount, numpad2count, numpad1count, numpad5count, numpad4count, spaceKeyCount;
     struct input_event ev[EV_BUF_SIZE];

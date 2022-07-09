@@ -1,8 +1,60 @@
 #include "include/Overlay.h"
+#define STB_IMAGE_IMPLEMENTATION
+#include "include/stb_image.h"
 
 static void glfwErrorCallback(int error, const char* description)
 {
     fprintf(stderr, "Glfw Error %d: %s\n", error, description);
+}
+
+// Simple helper function to load an image into a OpenGL texture with common settings
+bool Overlay::LoadTextureFromFile(const char* filename)
+{
+    unsigned char* imageData = stbi_load(filename, &imageWidth, &imageHeight, NULL, 4);
+    if (imageData == NULL)
+        return false;
+
+    // Create a OpenGL texture identifier
+    glGenTextures(1, &imageTexture);
+    glBindTexture(GL_TEXTURE_2D, imageTexture);
+
+    // Setup filtering parameters for display
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE); // This is required on WebGL for non power-of-two textures
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE); // Same
+
+    // Upload pixels into texture
+#if defined(GL_UNPACK_ROW_LENGTH) && !defined(__EMSCRIPTEN__)
+    glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
+#endif
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, imageWidth, imageHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, imageData);
+    stbi_image_free(imageData);
+
+    return true;
+}
+
+void Overlay::KeysUpdate()
+{
+    bool p_open = true;
+    ImGuiWindowFlags windowFlags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav;
+    windowFlags |= ImGuiWindowFlags_NoMove;
+    windowFlags |= ImGuiWindowFlags_NoBackground;
+    ImGui::SetNextWindowBgAlpha(0.0f); // Transparent background
+    const ImGuiViewport* main_viewport = ImGui::GetMainViewport();
+    ImGui::SetNextWindowPos(ImVec2(main_viewport->WorkPos.x + 900, main_viewport->WorkPos.y + 600), ImGuiCond_FirstUseEver);
+    ImGui::Begin("ArrowKeys", &p_open, windowFlags);
+    ImGui::SetWindowFontScale(1.5);
+    ImGui::Text("Position:  x: %d y: %d", inputHandler.xpos, inputHandler.ypos);
+    ImGui::Image((void*)(intptr_t)imageTexture, ImVec2(imageWidth, imageHeight));
+    ImGui::End();
+
+    ImGui::SetNextWindowPos(ImVec2(main_viewport->WorkPos.x + 1200, main_viewport->WorkPos.y + 600), ImGuiCond_FirstUseEver);
+    ImGui::Begin("Numpad Keys", &p_open, windowFlags);
+    ImGui::SetWindowFontScale(1.5);
+    ImGui::Text("Step size: %d", inputHandler.stepSize);
+    ImGui::Image((void*)(intptr_t)imageTexture, ImVec2(imageWidth, imageHeight));
+    ImGui::End();
 }
 
 Overlay::Overlay()
@@ -49,6 +101,9 @@ Overlay::Overlay()
         ImGui_ImplGlfw_InitForOpenGL(window, true);
         ImGui_ImplOpenGL3_Init(glsl_version);
         isInitialized = true;
+
+        bool ret = LoadTextureFromFile("./MyImage01.png");
+        IM_ASSERT(ret);
         printf("Successfully initialized overlay...\n");
     }
     else
@@ -88,6 +143,7 @@ void Overlay::Run()
             glfwSetWindowPos(window, inputHandler.xpos, inputHandler.ypos);
             glfwSetWindowSize(window, inputHandler.width, inputHandler.height);
             WindowSetUpdate();
+            KeysUpdate();
         }
         
 
@@ -95,6 +151,7 @@ void Overlay::Run()
         {
             glfwSetWindowAttrib(window, GLFW_MOUSE_PASSTHROUGH, GLFW_FALSE);
             Update();
+            ImGui::ShowDemoWindow();
         } 
         else
         {
