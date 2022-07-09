@@ -111,7 +111,7 @@ Overlay::Overlay()
         IM_ASSERT(ret);
         ret = LoadTextureFromFile(numKeysPath.c_str(), numKeysTexture, imageWidth, imageHeight);
         IM_ASSERT(ret);
-        printf("Successfully initialized overlay...\n");
+        printf("Successfully initialized LinuxOverlay v1.01...\n");
     }
     else
     {
