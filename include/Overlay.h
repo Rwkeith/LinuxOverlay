@@ -21,9 +21,9 @@ private:
     int imageHeight;
     GLuint arrowKeysTexture;
     GLuint numKeysTexture;
+public:
     typedef void (*UserOLFunc)();
     UserOLFunc userUpdateFunc = NULL;
-public:
     bool isInitialized;
     bool isRunning;
     Overlay();
