@@ -3,4 +3,4 @@ url = https://github.com/Rwkeith/imgui-meson.git
 revision = master
 
 [provide]
-dependency_names = ImGUI
+dependency_names = imgui
