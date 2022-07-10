@@ -2,16 +2,15 @@ project('Linux ImGui Overlay', 'cpp', default_options : ['default_library=static
 
 linuxOverlayInc = include_directories('./include')
 
+subproject('ImGUI')
+
 threadDep = dependency('threads')
 glfwDep = dependency('glfw')
 imguiDep = dependency('imgui')
-#ImGUILib = subproject('ImGUI').get_variable('libImGUIDep')
 
 sources = [
     'Overlay.cpp',
     'Input.cpp']
-
-
 
 buildType = get_option('LinuxOverlayBuildType')
 
