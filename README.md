@@ -10,6 +10,7 @@ Will configure the window to be top-most, transparent, and borderless.  When tog
 ## Using as library
 
 Example using LinuxOverlay with your project
+
 ```cpp
 #include "Overlay.h"
 
@@ -18,12 +19,21 @@ int main(int, char**)
     Overlay overlay;
     if (overlay.isInitialized)
     {
+        overlay.Register((Overlay::UserOLFunc)YourImGuiFunction);
         overlay.Run();
     }
     return 0;
 }
 ```
-
+And for your function
+```cpp
+void YourImGuiFunction()
+{
+    ImGui::Begin(...);
+    //Do all your magic here :)
+    ImGui::End();
+}
+```
 ## Interface Usage
 
 Run as sudo.  The overlay will start in window set mode.  Use the arrowkeys and numpad to adjust.  Then spacebar to set.
