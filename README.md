@@ -1,15 +1,16 @@
 ![Imgur Image](https://i.imgur.com/rM3tClN.png)
 
 # LinuxOverlay
-An external overlay which uses GLFW and ImGUI for drawing
+An external overlay which uses [GLFW](https://github.com/Rwkeith/glfw-meson) and [ImGUI](https://github.com/Rwkeith/imgui-meson) for drawing
 
 ## About
 
-This overlay setup uses GLFW as window manager.  It configures the window to be top-most, transparent, and borderless.  When toggling the overlay, mouse passthrough and the GUI is toggled.  Keyboard input is captured using the device /dev/input/eventN where N is for the keyboard device. Therefore Sudo/Root privledges are required to capture input.
+Will configure the window to be top-most, transparent, and borderless.  When toggling the overlay, mouse passthrough and the GUI is toggled.  Keyboard input is captured using the device /dev/input/eventN where N is for the keyboard device. Sudo/root privledges are required to capture input.
 
 ## Using as library
 
 Example using LinuxOverlay with your project
+
 ```cpp
 #include "Overlay.h"
 
@@ -18,12 +19,21 @@ int main(int, char**)
     Overlay overlay;
     if (overlay.isInitialized)
     {
+        overlay.Register((Overlay::UserOLFunc)YourImGuiFunction);
         overlay.Run();
     }
     return 0;
 }
 ```
-
+And for your function
+```cpp
+void YourImGuiFunction()
+{
+    ImGui::Begin(...);
+    //Do all your magic here :)
+    ImGui::End();
+}
+```
 ## Interface Usage
 
 Run as sudo.  The overlay will start in window set mode.  Use the arrowkeys and numpad to adjust.  Then spacebar to set.
