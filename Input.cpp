@@ -44,6 +44,7 @@ Input::Input()
     );
 
     inputHandlerThread = std::thread(&Input::InputHandler, this);
+    inputHandlerThread.detach();
     printf("Successfully created input thread.\n");
 }
 
