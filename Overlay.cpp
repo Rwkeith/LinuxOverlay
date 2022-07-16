@@ -94,7 +94,7 @@ Overlay::Overlay()
         IMGUI_CHECKVERSION();
         ImGui::CreateContext();
         ImGuiIO& io = ImGui::GetIO(); (void)io;
-
+        ImFont* font1 = io.Fonts->AddFontFromFileTTF("resources/Inter-Medium.otf", 18);
         // Setup Dear ImGui style
         ImGui::StyleColorsDark();
 
