@@ -94,7 +94,6 @@ Overlay::Overlay()
         IMGUI_CHECKVERSION();
         ImGui::CreateContext();
         ImGuiIO& io = ImGui::GetIO(); (void)io;
-        ImFont* font1 = io.Fonts->AddFontFromFileTTF("resources/Inter-Medium.otf", 18);
         // Setup Dear ImGui style
         ImGui::StyleColorsDark();
 
@@ -106,7 +105,8 @@ Overlay::Overlay()
         std::string exePath = GetExecutableDir();
         std::string arrowKeysPath = exePath + "resources/arrowKeys.png";
         std::string numKeysPath = exePath + "resources/numKeys.png";
-
+        std::string fontPath = exePath + "resources/Inter-Medium.otf";
+        io.Fonts->AddFontFromFileTTF(fontPath.c_str(), 18);
         bool ret = LoadTextureFromFile(arrowKeysPath.c_str(), arrowKeysTexture, imageWidth, imageHeight);
         IM_ASSERT(ret);
         ret = LoadTextureFromFile(numKeysPath.c_str(), numKeysTexture, imageWidth, imageHeight);
